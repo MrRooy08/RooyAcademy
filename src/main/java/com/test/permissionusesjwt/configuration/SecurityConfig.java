@@ -38,7 +38,8 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
             "/users","/auth/log-in","/auth/introspect","/auth/log-out"
-            ,"/auth/refresh","/level/create-level","/level"
+            ,"/auth/refresh","/level/create-level","/level","/course/create-course"
+            ,"/category/get-category","/social/create-social"
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
@@ -49,6 +50,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(requests ->
                 requests.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS)
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/course","/lesson/lesson-details/**","/course/get-course-name","/category/get-category") // Cho phép GET cho /course
                         .permitAll()
                         .anyRequest()
                         .authenticated());

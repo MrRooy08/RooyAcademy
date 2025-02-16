@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -19,8 +20,9 @@ public class CourseResponse {
     String name;
     String description;
     BigDecimal price;
+    String imageUrl;
+    String videoUrl;
     LevelRequest levelCourse;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    Set<String> lessonName;
 }

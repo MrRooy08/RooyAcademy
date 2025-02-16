@@ -1,10 +1,8 @@
 package com.test.permissionusesjwt.dto.request;
 
 import com.test.permissionusesjwt.validator.DobConstraint;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -13,20 +11,18 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults (level = AccessLevel.PRIVATE)
-public class UserCreationRequest {
-
-    @Size(min = 3, message = "USERNAME_INVALID")
-    String username;
-
-    @Size(min = 8, message = "PASSWORD_INVALID")
-    String password;
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ProfileRequest {
+    String user_id;
     String firstName;
     String lastName;
+    String headline;
+    String bio;
 
     @DobConstraint(min = 7, message = "INVALID_DOB")
     LocalDate dob;
 
-    Set<String> roles;
+
+    Set<ProfileSocialRequest> social;
 
 }

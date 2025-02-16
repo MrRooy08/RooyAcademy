@@ -1,21 +1,20 @@
 package com.test.permissionusesjwt.dto.request;
 
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CourseRequest {
-    String name;
-    String description;
-    BigDecimal price;
-    String imageUrl;
-    String videoUrl;
-    String levelCourse;
+public class EnrollmentRequest {
+
+    String userId;
+    String courseId;
+    LocalDateTime enrolled_at;
 
 }

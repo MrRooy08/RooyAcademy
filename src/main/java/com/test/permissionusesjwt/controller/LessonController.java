@@ -29,10 +29,18 @@ public class LessonController {
                 .build();
     }
 
-    @PostMapping("/create-lesson")
-    ApiResponse<LessonResponse> createLesson(@RequestBody LessonRequest lessonRequest) {
+    @GetMapping("/lesson-details/{courseName}")
+    ApiResponse<List<LessonResponse>> getLessonsByCourse(@PathVariable String courseName) {
+        return ApiResponse.<List<LessonResponse>>builder()
+                .result(lessonService.getLessonByCourseName(courseName))
+                 .build();
+    }
+
+
+    @PostMapping("/create-lesson/{courseName}")
+    ApiResponse<LessonResponse> createLesson(@PathVariable String courseName, @RequestBody LessonRequest lessonRequest) {
         return ApiResponse.<LessonResponse>builder()
-                .result(lessonService.createLesson(lessonRequest))
+                .result(lessonService.createLesson(courseName,lessonRequest))
                 .build();
     }
 

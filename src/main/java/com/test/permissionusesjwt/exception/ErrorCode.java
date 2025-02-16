@@ -21,6 +21,8 @@ public enum ErrorCode {
 
     COURSE_EXISTED (1009,"Course existed ",HttpStatus.BAD_REQUEST),
 
+    ENROLLMENT_EXISTED (1015,"ENROLLMENT_EXISTED ",HttpStatus.BAD_REQUEST),
+
     COURSE_NOT_EXISTED(1012, "Course not existed",HttpStatus.NOT_FOUND),
 
     LEVEL_NOT_EXISTED(1011, "Level not existed",HttpStatus.NOT_FOUND),
@@ -29,7 +31,7 @@ public enum ErrorCode {
 
     LESSON_NOT_EXISTED (1013,"Lesson not existed ",HttpStatus.BAD_REQUEST),
 
-    LESSON_EXISTED (1013,"Lesson existed ",HttpStatus.BAD_REQUEST),
+    LESSON_EXISTED (1014,"Lesson existed ",HttpStatus.BAD_REQUEST),
     //401 là unauthorized
     UNAUTHENTICATED(1006,"Unauthenticated ",HttpStatus.UNAUTHORIZED),
 

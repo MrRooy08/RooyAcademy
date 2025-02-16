@@ -41,8 +41,11 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         HashSet<Role> roles = new HashSet<>();
-        roleRepository.findById(DefinedRole.USER_ROLE).ifPresent(roles::add);
-        user.setRoles(roles);
+        roleRepository.findByName(DefinedRole.USER_ROLE)
+                .ifPresent(roles::add);
+//        user.setRoles(roles);
+//
+//        System.out.print("Role: "+ user.getRoles() + "RoleSet:" + roles.toString());
 
         try{
             user = userRepository.save(user);
@@ -54,21 +57,20 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public UserResponse updateUser (String id, UserUpdateRequest request)
-    {
-        User user = userRepository.findById(id).orElseThrow(()
-                -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        public UserResponse updateUser (String id, UserUpdateRequest request)
+        {
+            User user = userRepository.findById(id).orElseThrow(()
+                    -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 
-        userMapper.updateUser(user,request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+            userMapper.updateUser(user,request);
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        var roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new HashSet<>(roles));
+            var roles = roleRepository.findAllById(request.getRoles());
+            user.setRoles(new HashSet<>(roles));
 
-
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
+            return userMapper.toUserResponse(userRepository.save(user));
+        }
 
 
     @PreAuthorize("hasRole('ADMIN')") //kiểm tra trước khi method được thực hiện

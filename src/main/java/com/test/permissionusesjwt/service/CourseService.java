@@ -2,6 +2,7 @@ package com.test.permissionusesjwt.service;
 
 
 import com.test.permissionusesjwt.dto.request.CourseRequest;
+import com.test.permissionusesjwt.dto.request.CourseUpdateRequest;
 import com.test.permissionusesjwt.dto.response.CourseResponse;
 import com.test.permissionusesjwt.entity.Course;
 import com.test.permissionusesjwt.entity.Lesson;
@@ -20,6 +21,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -31,30 +33,22 @@ public class CourseService {
     CourseRepository courseRepository;
     CourseMapper courseMapper;
     LevelRepository levelRepository;
-    private final LessonRepository lessonRepository;
 
     public CourseResponse createCourse(CourseRequest courseRequest) {
         Course course = courseMapper.toCourse(courseRequest);
         Level level = levelRepository.findLevelByName(courseRequest.getLevelCourse()).orElseThrow(
                 ()-> new AppException(ErrorCode.LEVEL_NOT_EXISTED)
         );
-
-        Lesson lesson = lessonRepository.findLessonByName(courseRequest.getLessonName().toString()).orElseThrow(
-                () -> new AppException(ErrorCode.LESSON_NOT_EXISTED)
-        );
-
-        HashSet<Lesson> lessons = new HashSet<>();
-        lessons.add(lesson);
-
         course.setLevelCourse(level);
-        course.setLessons(lessons);
-
 
         LocalDateTime now = LocalDateTime.now();
         course.setCreatedAt(now);
         course.setUpdatedAt(now);
+
+
         try{
             course = courseRepository.save(course);
+
         }
         catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.COURSE_EXISTED);
@@ -70,10 +64,30 @@ public class CourseService {
                 .toList();
     }
 
+    public CourseResponse getCourseByName(String name) {
+        Course course = courseRepository.findByName(name).orElseThrow(
+                () -> new AppException(ErrorCode.COURSE_NOT_EXISTED)
+        );
+        return courseMapper.toCourseResponse(course);
+    }
+
+
+
+
     public void deleteCourse(String nameCourse) {
             Course course = courseRepository.findByName(nameCourse).orElseThrow(
                     ()-> new AppException(ErrorCode.COURSE_NOT_EXISTED)
             );
             courseRepository.delete(course);
+    }
+
+    public CourseResponse updateCourse(String name, CourseUpdateRequest courseRequest) {
+        Course course = courseRepository.findByName(name).orElseThrow(
+                () -> new AppException(ErrorCode.COURSE_NOT_EXISTED)
+        );
+
+        courseMapper.updateCourse(course,courseRequest);
+
+        return courseMapper.toCourseResponse(courseRepository.save(course));
     }
 }

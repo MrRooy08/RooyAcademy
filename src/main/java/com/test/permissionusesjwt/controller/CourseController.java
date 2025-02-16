@@ -2,7 +2,9 @@ package com.test.permissionusesjwt.controller;
 
 import com.test.permissionusesjwt.dto.request.ApiResponse;
 import com.test.permissionusesjwt.dto.request.CourseRequest;
+import com.test.permissionusesjwt.dto.request.CourseUpdateRequest;
 import com.test.permissionusesjwt.dto.response.CourseResponse;
+import com.test.permissionusesjwt.repository.CourseRepository;
 import com.test.permissionusesjwt.service.CourseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -40,4 +42,22 @@ public class CourseController {
         return ApiResponse.<Void>builder()
                 .build();
     }
+
+    @PutMapping("/{name}")
+    ApiResponse<CourseResponse> updateCourse(
+            @PathVariable String name,
+            @RequestBody CourseUpdateRequest courseRequest)
+    {
+        return ApiResponse.<CourseResponse>builder()
+                    .result(courseService.updateCourse(name,courseRequest))
+                    .build();
+    }
+
+    @GetMapping("/get-course-name")
+    ApiResponse<CourseResponse> getCourseByName (@RequestParam String name) {
+        return ApiResponse.<CourseResponse>builder()
+                .result(courseService.getCourseByName(name))
+                .build();
+    }
+
 }

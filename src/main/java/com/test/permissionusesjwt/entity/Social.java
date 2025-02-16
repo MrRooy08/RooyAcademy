@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
-
 @Getter
 @Setter
 @Builder
@@ -14,21 +13,14 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Role {
+public class Social {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(name="url",unique=true,columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci", nullable=false)
+    String url;
 
-    @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
-    String name;
-
-    String description;
-
-    @ManyToMany
-    Set<Permission> permissions;
-
-    public Role(String name) {
-        this.name = name;
-    }
+    @OneToMany (mappedBy = "social", fetch = FetchType.LAZY)
+    Set<ProfileSocial> profile;
 }

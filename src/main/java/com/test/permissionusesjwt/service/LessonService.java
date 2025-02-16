@@ -1,9 +1,7 @@
 package com.test.permissionusesjwt.service;
 
 import com.test.permissionusesjwt.dto.request.LessonRequest;
-import com.test.permissionusesjwt.dto.request.LevelRequest;
 import com.test.permissionusesjwt.dto.response.LessonResponse;
-import com.test.permissionusesjwt.dto.response.LevelResponse;
 import com.test.permissionusesjwt.entity.Course;
 import com.test.permissionusesjwt.entity.Lesson;
 import com.test.permissionusesjwt.exception.AppException;
@@ -18,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -29,9 +28,9 @@ public class LessonService {
     LessonRepository lessonRepository;
     CourseRepository courseRepository;
 
-    public LessonResponse createLesson(LessonRequest lessonRequest) {
+    public LessonResponse createLesson(String courseName,LessonRequest lessonRequest) {
         Lesson lesson = lessonMapper.toLesson(lessonRequest);
-         Course course = courseRepository.findByName(lessonRequest.getCourse()).orElseThrow(
+        Course course = courseRepository.findByName(courseName).orElseThrow(
                 () -> new AppException(ErrorCode.COURSE_NOT_EXISTED)
         );
 
@@ -66,5 +65,18 @@ public class LessonService {
         return lessonRepository.findAll().stream()
                 .map(lessonMapper::toLessonResponse)
                 .toList();
+    }
+
+    public List<LessonResponse> getLessonByCourseName (String courseName) {
+        Course course = courseRepository.findByName(courseName).orElseThrow(
+                () -> new AppException(ErrorCode.COURSE_NOT_EXISTED)
+        );
+
+        List<Lesson> lessons = lessonRepository.findByCourseId(course.getId());
+
+        return lessons.stream()
+                .map(lessonMapper::toLessonResponse)
+                .toList();
+
     }
 }

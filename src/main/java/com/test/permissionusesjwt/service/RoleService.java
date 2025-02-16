@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -40,8 +41,14 @@ public class RoleService {
     {
             var role = roleMapper.toRole(request);
 
-            var permission = permissionRepository.findAllById(request.getPermissions());
-            role.setPermissions(new HashSet<>(permission));
+            HashSet<Permission> permissions = new HashSet<>();
+            for (String permission : request.getPermissions()) {
+                permissionRepository.findByName(permission)
+                        .ifPresent(permissions::add);
+            }
+
+
+            role.setPermissions(permissions);
 
             role = roleRepository.save(role);
             return roleMapper.toRoleResponse(role);
