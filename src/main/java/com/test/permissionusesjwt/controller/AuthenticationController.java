@@ -5,6 +5,8 @@ import com.test.permissionusesjwt.dto.request.*;
 import com.test.permissionusesjwt.dto.response.AuthenticationResponse;
 import com.test.permissionusesjwt.dto.response.IntrospectResponse;
 import com.test.permissionusesjwt.service.AuthenticationService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,11 +26,18 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/log-in")
-    ApiResponse<AuthenticationResponse> authenticate (@RequestBody AuthenticationRequest request)
+    ApiResponse<String> authenticate (@RequestBody AuthenticationRequest request,
+        HttpServletResponse response)
     {
-        var result  =  authenticationService.authenticate(request);
-        return ApiResponse.<AuthenticationResponse>builder()
-                .result(result)
+        AuthenticationResponse authResponse =  authenticationService.authenticate(request);
+        Cookie cookie = new Cookie("jwt", authResponse.getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); //dùng cho https
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        response.addCookie(cookie);
+        return ApiResponse.<String>builder()
+                .result("Login successfully")
                 .build();
     }
 
