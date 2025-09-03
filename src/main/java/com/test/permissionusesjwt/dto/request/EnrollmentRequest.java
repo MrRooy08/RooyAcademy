@@ -12,9 +12,5 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EnrollmentRequest {
-
-    String userId;
     String courseId;
-    LocalDateTime enrolled_at;
-
 }

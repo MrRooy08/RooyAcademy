@@ -14,17 +14,17 @@ import lombok.experimental.FieldDefaults;
 @Entity
 public class ProfileSocial {
 
+
     @EmbeddedId
     ProfileSocialID profileSocialID;
 
     @ManyToOne
     @MapsId ("profile_id")
+    @JoinColumn (name = "ma_hoc_vien")
     Profile profile;
 
     @ManyToOne
     @MapsId ("social_id")
+    @JoinColumn (name = "ma_mxh")
     Social social;
-
-    @Column
-    String name;
 }

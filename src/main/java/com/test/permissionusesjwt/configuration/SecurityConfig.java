@@ -30,9 +30,11 @@ public class SecurityConfig {
     private final CustomJwtDecoder customJwtDecoder;
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users","/auth/log-in","/auth/introspect","/auth/log-out"
-            ,"/auth/refresh","/level/create-level","/level","/course/create-course"
-            ,"/category/get-category","/social/create-social"
+            "/files/**","/users",
+            "/users/verify-otp","/auth/**","/level/create-level","/level","/course/create-course-daft"
+            ,"/category/get-category","/social/create-social","/section/get-section-by-course/**",
+            "/tier-price"
+
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
@@ -44,8 +46,8 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(requests ->
                 requests.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS)
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/course","/lesson/lesson-details/**","/course/get-course-name","/category/get-category") // Cho phép GET cho /course
-                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,"/files/**","/tier-price", "/upload/lesson/**", "/payment/vnpay-return",
+                                "/course/**","/section/**","/lesson/**","/course/get-course-name","/category/get-category").permitAll()
                         .anyRequest()
                         .authenticated());
         httpSecurity.addFilterBefore(new JwtCookieFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -53,7 +55,7 @@ public class SecurityConfig {
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()
-                                )
+                        )
 //                //authenticate cho jwt và decode jwt token được truyền vào nên dùng decoder
 //                //jwtSetUri nếu cấu hình 1 resource thứ ba thì sẽ cần
 //
@@ -101,8 +103,10 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
+        corsConfiguration.addAllowedOriginPattern("https://*.ngrok-free.app");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);

@@ -1,18 +1,28 @@
 package com.test.permissionusesjwt.dto.response;
 
-import com.test.permissionusesjwt.entity.Course;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LessonResponse {
+    String id;
     String name;
+    String description;
     String content;
-    String videoUrl;
-    String courseName;
+    String index;
+    String isPreviewable;
+    String video_url;
+
+    @Builder.Default
+    Map<String,String> mediaList = new HashMap<>();
 }
+

@@ -3,18 +3,13 @@ package com.test.permissionusesjwt.mapper;
 import com.test.permissionusesjwt.dto.request.UserCreationRequest;
 import com.test.permissionusesjwt.dto.request.UserUpdateRequest;
 import com.test.permissionusesjwt.dto.response.UserResponse;
-import com.test.permissionusesjwt.exception.AppException;
-import com.test.permissionusesjwt.exception.ErrorCode;
-import com.test.permissionusesjwt.repository.RoleRepository;
+
 import com.test.permissionusesjwt.entity.Role;
 import com.test.permissionusesjwt.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +33,9 @@ public interface UserMapper {
     //@Mapping (source = "firstName", target = "lastName"): 2 giá trị này sẽ bằng nhau
 
 
+    @Mapping(target = "instructorId", expression = "java(user.getInstructor() != null ? user.getInstructor().getId() : null)")
+    @Mapping(target = "studentId", expression = "java(user.getProfile() != null ? user.getProfile().getId() : null)")
+    @Mapping(target = "cart", ignore = true)
     UserResponse toUserResponse (User user);
     //Trong mapstruct sẽ tạo 1 đối tượng mới khi map
     // nên dùng MappingTarget thì mapstruct sẽ thay đôổi trực tiếp object đó và k taạo mới
