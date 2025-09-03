@@ -56,34 +56,43 @@ public class GlobalExceptionHandler {
 //    }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse> handlingNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ApiResponse> handlingNotValidException(MethodArgumentNotValidException e) {
+        // Lấy message từ annotation validation
         String enumKey = Objects.requireNonNull(e.getFieldError()).getDefaultMessage();
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
-        Map<String,Object> attributes = null;
-        try
-        {
+        Map<String, Object> attributes = null;
+
+        try {
+            // Kiểm tra nếu message trong annotation trùng với enum ErrorCode
             errorCode = ErrorCode.valueOf(enumKey);
+
             var constraintViolation = e.getBindingResult()
                     .getAllErrors()
                     .stream()
                     .findFirst()
                     .map(error -> error.unwrap(ConstraintViolation.class))
                     .orElse(null);
-            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
-            log.info(attributes.toString());
 
-        }
-        catch (IllegalArgumentException e1){
+            if (constraintViolation != null) {
+                attributes = constraintViolation.getConstraintDescriptor().getAttributes();
+                log.info("Validation attributes: {}", attributes);
+            }
 
+        } catch (IllegalArgumentException ex) {
+            log.warn("Validation message '{}' không khớp với ErrorCode enum, dùng mặc định INVALID_KEY", enumKey);
         }
 
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(Objects.nonNull(attributes) ?
-                mapAttribute(errorCode.getMessage(), attributes) :
-                errorCode.getMessage());
+        apiResponse.setMessage(
+                Objects.nonNull(attributes)
+                        ? mapAttribute(errorCode.getMessage(), attributes)
+                        : errorCode.getMessage()
+        );
+
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
 
 //    @ExceptionHandler(value = AccessDeniedException.class)
 //    ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException e) {

@@ -1,15 +1,20 @@
 package com.test.permissionusesjwt.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.test.permissionusesjwt.dto.request.ApiResponse;
 import com.test.permissionusesjwt.dto.request.UserCreationRequest;
 import com.test.permissionusesjwt.dto.request.UserUpdateRequest;
 import com.test.permissionusesjwt.dto.response.UserResponse;
+import com.test.permissionusesjwt.entity.OtpVerification;
+import com.test.permissionusesjwt.producer.RabbitProducer;
+import com.test.permissionusesjwt.service.EmailService;
 import com.test.permissionusesjwt.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +28,24 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
+    EmailService emailService;
+    RabbitProducer rabbitProducer;
 
     @PostMapping()
+    ResponseEntity<String> verifyAccount (@RequestBody @Valid UserCreationRequest request) throws JsonProcessingException {
+        boolean check = userService.checkEmail(request.getUsername());
+        if (check) {
+
+            OtpVerification otpVerification = emailService.sendOtp(request.getUsername());
+            rabbitProducer.sendMailMessage(otpVerification.getEmail(), otpVerification.getOtp());
+            return ResponseEntity.ok("OTP đã được gửi đến email của bạn");
+        }
+        else {
+            return ResponseEntity.badRequest().body("Email đa tồn tai trong hệ thống");
+        }
+    }
+
+    @PostMapping("/verify-otp")
     ApiResponse<UserResponse> createUser (@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createRequest(request))
@@ -35,7 +56,6 @@ public class UserController {
     ApiResponse<List<UserResponse>> getAllUsers ()
     {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-
 
         log.info("Username: {}",authentication.getName());
         authentication.getAuthorities().forEach(

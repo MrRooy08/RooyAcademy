@@ -3,7 +3,6 @@ package com.test.permissionusesjwt.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -13,9 +12,11 @@ import java.math.BigDecimal;
 public class CourseRequest {
     String name;
     String description;
-    BigDecimal price;
     String imageUrl;
     String videoUrl;
     String levelCourse;
+    String category;
+    String price_id;
+    String topic;
 
 }

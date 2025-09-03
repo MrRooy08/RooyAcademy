@@ -5,24 +5,21 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.test.permissionusesjwt.dto.request.AuthenticationRequest;
-import com.test.permissionusesjwt.dto.request.IntrospectRequest;
-import com.test.permissionusesjwt.dto.request.LogOutRequest;
-import com.test.permissionusesjwt.dto.request.RefreshRequest;
+import com.test.permissionusesjwt.constant.DefinedRole;
+import com.test.permissionusesjwt.dto.request.*;
 import com.test.permissionusesjwt.dto.response.AuthenticationResponse;
 import com.test.permissionusesjwt.dto.response.IntrospectResponse;
-import com.test.permissionusesjwt.entity.InvalidatedToken;
-import com.test.permissionusesjwt.entity.User;
+import com.test.permissionusesjwt.entity.*;
 import com.test.permissionusesjwt.exception.AppException;
 import com.test.permissionusesjwt.exception.ErrorCode;
-import com.test.permissionusesjwt.repository.InvalidatedTokenRepository;
-import com.test.permissionusesjwt.repository.UserRepository;
+import com.test.permissionusesjwt.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,10 +27,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -42,6 +39,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
 
+    private final InstructorRepository instructorRepository;
     @NonFinal //đánh dấu k tạo constructer
     @Value("${jwt.signer.key}")
     protected String SIGNER_KEY;
@@ -55,6 +53,8 @@ public class AuthenticationService {
     protected long REFRESHABLE_DURATION;
 
     UserRepository userRepository;
+    RoleRepository roleRepository;
+    ProfileRepository profileRepository;
     InvalidatedTokenRepository tokenRepository;
 
 
@@ -72,6 +72,68 @@ public class AuthenticationService {
                 .token(token)
                 .authenticated(true)
                 .build();
+    }
+
+    public AuthenticationResponse authenticateGoogle (UserGoogleCreate authRequest)
+    {
+        var user = userRepository.findByUsername(authRequest.getEmail()).orElseGet(
+                () -> createGoogleRequest(authRequest)
+        );
+        log.info(user.toString());
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
+    }
+
+    private User createGoogleRequest(UserGoogleCreate authRequest){
+        User user = new User();
+        List<String> defaultRoles = List.of(
+                DefinedRole.USER_ROLE,
+                DefinedRole.INSTRUCTOR_ROLE
+        );
+
+        Set<Role> roles = defaultRoles.stream()
+                .map(roleRepository::findByName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+
+        user.setUsername(authRequest.getEmail());
+        user.setRoles(roles);
+        user.setIsActive(true);
+        try{
+            user = userRepository.save(user);
+            String username = authRequest.getTen();
+            String firstName = "";
+            String lastName = username;
+            if (username.contains(" ")) {
+                int idx = username.lastIndexOf(" ");
+                firstName = username.substring(0, idx);
+                lastName = username.substring(idx+1);
+            }
+            Profile profile = Profile.builder()
+                    .user(user)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .headline("")
+                    .bio("")
+                    .dob(LocalDate.now())
+                    .build();
+            profileRepository.save(profile);
+
+            Instructor instructor = Instructor.builder()
+                    .user(user)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .build();
+            instructorRepository.save(instructor);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+        return user;
     }
 
     public IntrospectResponse introspect (IntrospectRequest request)
@@ -106,6 +168,7 @@ public class AuthenticationService {
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope",buildScope(user))
+
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
@@ -155,6 +218,7 @@ public class AuthenticationService {
                 .build();
 
         tokenRepository.save(invalidatedToken);
+
     }
 
     private SignedJWT verifyToken (String  token, boolean isRefresh)
@@ -214,6 +278,5 @@ public class AuthenticationService {
                 .token(token)
                 .authenticated(true)
                 .build();
-
     }
 }

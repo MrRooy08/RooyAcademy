@@ -16,29 +16,32 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Table (name = "danh_muc")
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column (name = "ma_danh_muc")
     String id;
 
-    @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(name = "ten_danh_muc", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String name;
 
+    @Column(name = "mo_ta")
+    String description;
+
     @ManyToOne
-    @JoinColumn( name = "parent_id")
+    @JoinColumn( name = "ma_danh_muc_cha")
     @Nullable
     Category parent;
 
     @OneToMany( mappedBy = "parent" , cascade = CascadeType.ALL)
     List<Category> subCategories;
 
-    @ManyToMany
-            @JoinTable(
-                    name = "category_course",
-                    joinColumns = @JoinColumn (name = "category_id"),
-                    inverseJoinColumns = @JoinColumn (name = "course_id")
-            )
+    @OneToMany (mappedBy = "category", cascade = CascadeType.ALL)
     Set<Course> courses;
+
+    @OneToMany (mappedBy = "category", cascade = CascadeType.ALL)
+    Set<Topic> topics;
 
 }

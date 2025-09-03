@@ -13,10 +13,11 @@ import java.util.Set;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CourseUpdateRequest {
+    String name;
     String description;
-    BigDecimal price;
+    String subtitle;
+    String category;
+    String price;
+    String topic;
     String levelCourse;
-    String imageUrl;
-    String videoUrl;
-
 }

@@ -14,18 +14,31 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Table (name = "vai_tro")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "ma_vai_tro")
     String id;
 
 
-    @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(name = "ten_quyen", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String name;
 
+    @Column(name = "mo_ta")
     String description;
 
+    @ManyToMany (mappedBy = "roles")
+    Set<User> users;
+
+
+
     @ManyToMany
+    @JoinTable(
+            name = "vai_tro_quyen",
+            joinColumns = @JoinColumn (name = "ma_vai_tro"),
+            inverseJoinColumns = @JoinColumn (name = "ma_quyen")
+    )
     Set<Permission> permissions;
 
     public Role(String name) {

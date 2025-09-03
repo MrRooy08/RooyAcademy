@@ -1,17 +1,15 @@
 package com.test.permissionusesjwt.mapper;
 
 import com.test.permissionusesjwt.dto.request.ProfileRequest;
-import com.test.permissionusesjwt.dto.request.RoleRequest;
+
 import com.test.permissionusesjwt.dto.response.ProfileResponse;
 import com.test.permissionusesjwt.dto.response.ProfileSocialResponse;
-import com.test.permissionusesjwt.dto.response.RoleResponse;
+
 import com.test.permissionusesjwt.entity.Profile;
 import com.test.permissionusesjwt.entity.ProfileSocial;
-import com.test.permissionusesjwt.entity.Role;
+
 import com.test.permissionusesjwt.entity.User;
-import com.test.permissionusesjwt.exception.AppException;
-import com.test.permissionusesjwt.exception.ErrorCode;
-import com.test.permissionusesjwt.repository.UserRepository;
+
 import org.mapstruct.*;
 
 import java.util.HashSet;
@@ -35,7 +33,7 @@ public interface ProfileMapper {
     }
 
     @Mapping(source = "user", target = "user_id", qualifiedByName = "mapUserToString")
-    @Mapping(source = "profile", target = "social", qualifiedByName = "mapPStoPSR")
+//    @Mapping(source = "profile", target = "social", qualifiedByName = "mapPStoPSR")
     ProfileResponse toProfileResponse (Profile profile);
 
     @Named("mapUserToString")
@@ -46,18 +44,17 @@ public interface ProfileMapper {
         return user.getId();
     }
 
-    @Named("mapPStoPSR")
-    default Set<ProfileSocialResponse> mapPStoPSR(Set<ProfileSocial> profileSocial) {
-        if (profileSocial == null || profileSocial.isEmpty()) {
-            return null;
-        }
-
-        return profileSocial.stream()
-                .map(temp -> new ProfileSocialResponse(
-                        temp.getSocial().getUrl(),
-                        temp.getName()
-                ))
-                .collect(Collectors.toSet());
-    }
+//    @Named("mapPStoPSR")
+//    default Set<ProfileSocialResponse> mapPStoPSR(Set<ProfileSocial> profileSocial) {
+//        if (profileSocial == null || profileSocial.isEmpty()) {
+//            return null;
+//        }
+//
+//        return profileSocial.stream()
+//                .map(temp -> new ProfileSocialResponse(
+//                        temp.getSocial().getUrl()
+//                ))
+//                .collect(Collectors.toSet());
+//    }
 
 }

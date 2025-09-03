@@ -15,10 +15,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProfileSocialID implements Serializable {
 
-    @Column (name = "profile_id")
+    @Column (name = "ma_hoc_vien")
     String profile_id;
 
-    @Column (name = "social_id")
+    @Column (name = "ma_mxh")
     String social_id;
 
 }

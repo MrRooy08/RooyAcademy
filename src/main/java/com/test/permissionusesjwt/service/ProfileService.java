@@ -78,7 +78,7 @@ public class ProfileService {
 
                 profileSocial.setProfileSocialID(profileSocialID);
                 profileSocial.setSocial(social);
-                profileSocial.setName(p.getUsername());
+//                profileSocial.setName(p.getUsername());
                 profileSocial.setProfile(profile);
                 listToSave.add(profileSocial);
             }
@@ -88,13 +88,13 @@ public class ProfileService {
             profileSocialRepository.saveAll(listToSave);
 
             // xoá dữ liệu mxh nào là null để toi uu db
-            for (ProfileSocial p : listToSave)
-            {
-                if ( p.getName() == null || p.getName().isEmpty() )
-                {
-                    profileSocialRepository.delete(p);
-                }
-            }
+//            for (ProfileSocial p : listToSave)
+//            {
+//                if ( p.getName() == null || p.getName().isEmpty() )
+//                {
+//                    profileSocialRepository.delete(p);
+//                }
+//            }
         }
         return profileMapper.toProfileResponse(profile);
     }

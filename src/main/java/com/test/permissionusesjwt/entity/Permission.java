@@ -15,12 +15,22 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Table (name = "quyen")
 public class Permission {
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
+    @Column(name = "ma_quyen")
     String id;
 
-    @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(name = "ten_quyen", unique = true, columnDefinition = "VARCHAR(100) COLLATE utf8mb4_unicode_ci")
     String name;
+
+    @Column(name = "mo_ta")
     String description;
+
+    @ManyToMany (mappedBy = "permissions")
+    Set<Role> roles;
+
+    @ManyToMany (mappedBy = "permissions")
+    Set<InstructorCourse> instructorCourses;
 }

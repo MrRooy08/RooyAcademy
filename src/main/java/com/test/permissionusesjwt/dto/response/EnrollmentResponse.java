@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EnrollmentResponse {
 
-    String userId;
+    String profileId;
     String courseId;
     LocalDateTime enrolled_at;
 
