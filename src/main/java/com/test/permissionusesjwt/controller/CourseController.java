@@ -1,18 +1,14 @@
 package com.test.permissionusesjwt.controller;
 
-import com.test.permissionusesjwt.authUtils.PaginationUtils;
 import com.test.permissionusesjwt.dto.request.*;
 import com.test.permissionusesjwt.dto.request.CoursePriceUpdateRequest;
 import com.test.permissionusesjwt.dto.response.*;
-import com.test.permissionusesjwt.entity.Course;
-import com.test.permissionusesjwt.exception.AppException;
 import com.test.permissionusesjwt.service.CourseMetaService;
 import com.test.permissionusesjwt.service.CourseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
