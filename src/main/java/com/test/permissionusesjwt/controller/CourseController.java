@@ -1,18 +1,14 @@
 package com.test.permissionusesjwt.controller;
 
-import com.test.permissionusesjwt.authUtils.PaginationUtils;
 import com.test.permissionusesjwt.dto.request.*;
 import com.test.permissionusesjwt.dto.request.CoursePriceUpdateRequest;
 import com.test.permissionusesjwt.dto.response.*;
-import com.test.permissionusesjwt.entity.Course;
-import com.test.permissionusesjwt.exception.AppException;
 import com.test.permissionusesjwt.service.CourseMetaService;
 import com.test.permissionusesjwt.service.CourseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +24,6 @@ import java.util.List;
 public class CourseController {
     CourseService courseService;
     CourseMetaService courseMetaService;
-    PaginationUtils paginationUtils;
 
     @GetMapping
     ApiResponse<List<CourseResponse>> getAllCourses() {
@@ -82,8 +77,7 @@ public class CourseController {
     @GetMapping("/get-course-by-status")
     ApiResponse<PagedResponse<CourseResponse>> getCourseByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int page,
                                                     @RequestParam (defaultValue = "5") int size) {
-        Page<CourseResponse> pageResponse = courseService.getCoursesByStatus(status, page, size);
-        PagedResponse<CourseResponse> response = paginationUtils.mapPageToPagedResponse(pageResponse);
+        PagedResponse<CourseResponse> response = courseService.getCoursesByStatus(status, page, size);
         return ApiResponse.<PagedResponse<CourseResponse>>builder()
                 .message("Successfully")
                 .result(response)
