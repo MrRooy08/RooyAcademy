@@ -82,8 +82,7 @@ public class CourseController {
     @GetMapping("/get-course-by-status")
     ApiResponse<PagedResponse<CourseResponse>> getCourseByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int page,
                                                     @RequestParam (defaultValue = "5") int size) {
-        Page<CourseResponse> pageResponse = courseService.getCoursesByStatus(status, page, size);
-        PagedResponse<CourseResponse> response = paginationUtils.mapPageToPagedResponse(pageResponse);
+        PagedResponse<CourseResponse> response = courseService.getCoursesByStatus(status, page, size);
         return ApiResponse.<PagedResponse<CourseResponse>>builder()
                 .message("Successfully")
                 .result(response)

@@ -2,6 +2,7 @@ package com.test.permissionusesjwt.service;
 
 
 import com.test.permissionusesjwt.authUtils.AuthUtils;
+import com.test.permissionusesjwt.authUtils.PaginationUtils;
 import com.test.permissionusesjwt.dto.request.*;
 import com.test.permissionusesjwt.dto.request.CoursePriceUpdateRequest;
 import com.test.permissionusesjwt.dto.response.*;
@@ -71,6 +72,7 @@ public class CourseService {
     private final TopicRepository topicRepository;
     private final EnrollRepository enrollRepository;
     AssignmentService assignmentService;
+    private final PaginationUtils paginationUtils;
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -442,10 +444,11 @@ public class CourseService {
     @PreAuthorize("hasAnyRole('ADMIN','INSTRUCTOR')")
     @Cacheable( value = "getCoursesByStatus",
             key = "#status + '-' + #page + '-' + #size + '-' + @courseSecurity.getCurrentUsername()")
-    public Page<CourseResponse> getCoursesByStatus(String status, int page, int size) {
+    public PagedResponse<CourseResponse> getCoursesByStatus(String status, int page, int size) {
         String username = authUtils.getCurrentUsername();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
+        Page<CourseResponse> pageResponse;
         // Lấy authorities hiện tại
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin      = auth.getAuthorities().stream()
@@ -456,14 +459,14 @@ public class CourseService {
         if (isAdmin) {
             if (status.equalsIgnoreCase("all")) {
                 // Trả về tất cả các khóa học, không phân biệt trạng thái
-                return courseRepository.findByApproveStatusIn(Arrays.asList(ApproveStatus.PROCESSING, ApproveStatus.APPROVED, ApproveStatus.REJECTED), pageable)
-                        .map(courseMapper::toCourseResponse);
+                return paginationUtils.mapPageToPagedResponse(courseRepository.findByApproveStatusIn(Arrays.asList(ApproveStatus.PROCESSING, ApproveStatus.APPROVED, ApproveStatus.REJECTED), pageable)
+                        .map(courseMapper::toCourseResponse));
             } else {
                 // Nếu có status cụ thể, chuyển đổi nó thành ApproveStatus
                 try {
                     ApproveStatus approveStatus = ApproveStatus.valueOf(status);
-                    return courseRepository.findByApproveStatus(approveStatus, pageable)
-                            .map(courseMapper::toCourseResponse);
+                    return paginationUtils.mapPageToPagedResponse(courseRepository.findByApproveStatus(approveStatus, pageable)
+                            .map(courseMapper::toCourseResponse));
                 } catch (IllegalArgumentException e) {
                     throw new AppException(ErrorCode.COURSE_NOT_EXISTED);
                 }
@@ -495,7 +498,7 @@ public class CourseService {
                         .toList();
 
                 Page<Course> filteredPage = new PageImpl<>(filtered, pageable, filtered.size());
-                return filteredPage.map(courseMapper::toCourseResponse);
+                return paginationUtils.mapPageToPagedResponse(filteredPage.map(courseMapper::toCourseResponse));
             } catch (IllegalArgumentException e) {
                 throw new AppException(ErrorCode.COURSE_NOT_EXISTED);
             } catch (AppException e) {
