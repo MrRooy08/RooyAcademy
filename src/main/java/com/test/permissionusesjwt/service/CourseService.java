@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -439,6 +440,8 @@ public class CourseService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','INSTRUCTOR')")
+    @Cacheable( value = "getCoursesByStatus",
+            key = "#status + '-' + #page + '-' + #size + '-' + @courseSecurity.getCurrentUsername()")
     public Page<CourseResponse> getCoursesByStatus(String status, int page, int size) {
         String username = authUtils.getCurrentUsername();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
