@@ -28,7 +28,6 @@ import java.util.List;
 public class CourseController {
     CourseService courseService;
     CourseMetaService courseMetaService;
-    PaginationUtils paginationUtils;
 
     @GetMapping
     ApiResponse<List<CourseResponse>> getAllCourses() {
